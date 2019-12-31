@@ -1,6 +1,26 @@
 #include "keylogger.h"
 #include <time.h>
+#include <pthread.h>
 
+void *threadproc(void *arg)
+{
+  printf("started running pulse" );
+  while(true)
+    {
+      sleep(15);
+
+      time_t rawtime;
+      struct tm * timeinfo;
+      time ( &rawtime );
+      timeinfo = localtime ( &rawtime );
+
+      fprintf(logfile, "PULSE :: ");
+      fprintf(logfile, "%s", asctime(timeinfo));
+      fflush(logfile);
+      /* printf("running pulse" ); */
+    }
+  return 0;
+}
 
 int main(int argc, const char *argv[]) {
 
@@ -42,7 +62,13 @@ int main(int argc, const char *argv[]) {
 
     printf("Logging to: %s\n", logfileLocation);
     fflush(stdout);
+
+    pthread_t tid;
+    pthread_create(&tid, NULL, &threadproc, NULL);
+
+
     CFRunLoopRun();
+
 
     return 0;
 }
@@ -66,6 +92,7 @@ CGEventRef CGEventCallback(CGEventTapProxy proxy, CGEventType type, CGEventRef e
 
     return event;
 }
+
 
 const char *convertKeyCode(int keyCode) {
     switch ((int) keyCode) {
